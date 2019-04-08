@@ -32,6 +32,8 @@ public class RegisterActivity extends AppCompatActivity {
         _password=(EditText)findViewById(R.id.editTextPassword);
         _register= (Button) findViewById(R.id.btn_signup);
 
+        databaseHelper= new DatabaseHelper(this);
+
 
         _register.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -40,16 +42,16 @@ public class RegisterActivity extends AppCompatActivity {
                 Log.e("Register","ONclick");
 
                 user=new User();
-                databaseHelper=new DatabaseHelper(getApplicationContext());
+
 
                 user.setName(_name.getText().toString());
                 user.setEmail(_email.getText().toString());
                 user.setPassword(_password.getText().toString());
 
-               // databaseHelper.addUser(user);
+                databaseHelper.addUser(user);
 
                 clearTexts();
-              //  getAllUsersInformation();
+                getAllUsersInformation();
 
 
             }

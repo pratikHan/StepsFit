@@ -20,6 +20,8 @@ public class LoginActivity extends AppCompatActivity {
     Button buttonLogin;
     TextView signupLink;
 
+    DatabaseHelper databaseHelper;
+
     private static final int REQUEST_CODE=0;
 
 
@@ -33,12 +35,21 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin=(Button)findViewById(R.id.button);
         signupLink=(TextView)findViewById(R.id.textView);
 
+        databaseHelper=new DatabaseHelper(this);
+
 
 
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.e("Login", "Login button pressed");
+
+                if(databaseHelper.checkUser(edittextEmail.getText().toString().trim(),editTextPassword.getText().toString().trim())){
+
+                    Log.e("LOGIN","Login Successfull");
+                }else{
+                    Log.e("Login","No USer Found");
+                }
             }
         });
 

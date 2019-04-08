@@ -16,6 +16,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME= "UserManager.db";
     private static final int DATABASE_VERSION=1;
     private static  final String DATABASE_TABLE= "table_user";
+    SQLiteDatabase db;
 
 
     //user columns
@@ -44,11 +45,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + DATABASE_TABLE;
 
+    private static DatabaseHelper sInstance;
+
+    public static synchronized DatabaseHelper getInstance(Context context){
+
+        if(sInstance==null){
+            sInstance= new DatabaseHelper(context.getApplicationContext());
+        }
+
+        return sInstance;
+    }
 
    public DatabaseHelper(Context context){
 
        super(context,DATABASE_NAME,null, DATABASE_VERSION);
        Log.e("DB","Oncreate1");
+       db=getWritableDatabase();
    }
 
     @Override
@@ -83,11 +95,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(USER_NAME, user.getName());
         values.put(EMAIL, user.getEmail());
         values.put(PASSWORD, user.getPassword());
-        values.put(CONTACT_NUMBER,user.getPhoneNumber());
+
+        /*  values.put(CONTACT_NUMBER,user.getPhoneNumber());
         values.put(STEPS,user.getSteps());
         values.put(IDLE_TIME,user.getTotal_idleTime());
         values.put(LOCATION_HOME,user.getLocation_home());
-        values.put(LOCATION_OFFICE,user.getLocation_office());
+        values.put(LOCATION_OFFICE,user.getLocation_office());*/
 
         // Inserting Row
         db.insert(DATABASE_TABLE, null, values);
@@ -150,6 +163,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // return user list
         return userList;
+    }
+
+
+
+    public boolean checkUser(String email, String password) {
+
+        // array of columns to fetch
+        String[] columns = {
+                USER_NAME
+        };
+        SQLiteDatabase db = this.getReadableDatabase();
+        // selection criteria
+        String selection = EMAIL + " = ?" + " AND " + PASSWORD + " = ?";
+
+        // selection arguments
+        String[] selectionArgs = {email, password};
+
+        // query user table with conditions
+        /**
+         * Here query function is used to fetch records from user table this function works like we use sql query.
+         * SQL query equivalent to this query function is
+         * SELECT user_id FROM user WHERE user_email = 'jack@androidtutorialshub.com' AND user_password = 'qwerty';
+         */
+        Cursor cursor = db.query(DATABASE_TABLE, //Table to query
+                columns,                    //columns to return
+                selection,                  //columns for the WHERE clause
+                selectionArgs,              //The values for the WHERE clause
+                null,                       //group the rows
+                null,                       //filter by row groups
+                null);                      //The sort order
+
+        int cursorCount = cursor.getCount();
+
+        cursor.close();
+        db.close();
+        if (cursorCount > 0) {
+            return true;
+        }
+
+        return false;
     }
 
 }
