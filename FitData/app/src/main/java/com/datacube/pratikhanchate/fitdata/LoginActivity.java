@@ -47,6 +47,8 @@ public class LoginActivity extends AppCompatActivity {
                 if(databaseHelper.checkUser(edittextEmail.getText().toString().trim(),editTextPassword.getText().toString().trim())){
 
                     Log.e("LOGIN","Login Successfull");
+                    Intent intent = new Intent(getApplicationContext(), StepCounter.class);
+                    startActivity(intent);
                 }else{
                     Log.e("Login","No USer Found");
                 }
