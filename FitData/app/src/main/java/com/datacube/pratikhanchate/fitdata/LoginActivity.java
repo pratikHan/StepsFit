@@ -12,6 +12,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.Serializable;
+
 public class LoginActivity extends AppCompatActivity {
 
 
@@ -21,6 +23,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView signupLink;
 
     DatabaseHelper databaseHelper;
+   // UserModel usermodel;
 
     private static final int REQUEST_CODE=0;
 
@@ -35,7 +38,7 @@ public class LoginActivity extends AppCompatActivity {
         buttonLogin=(Button)findViewById(R.id.button);
         signupLink=(TextView)findViewById(R.id.textView);
 
-        databaseHelper=new DatabaseHelper(this);
+        databaseHelper=new DatabaseHelper(this.getApplicationContext());
 
 
 
@@ -47,7 +50,11 @@ public class LoginActivity extends AppCompatActivity {
                 if(databaseHelper.checkUser(edittextEmail.getText().toString().trim(),editTextPassword.getText().toString().trim())){
 
                     Log.e("LOGIN","Login Successfull");
+
+                  //  usermodel=new UserModel(edittextEmail.getText().toString(),databaseHelper);
                     Intent intent = new Intent(getApplicationContext(), StepCounter.class);
+                    intent.putExtra("EMAIL_ID",""+edittextEmail.getText().toString());
+                   // intent.putExtra("DBOBJ", (Serializable) databaseHelper);
                     startActivity(intent);
                 }else{
                     Log.e("Login","No USer Found");

@@ -2,6 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.datacube.pratikhanchate.fitdata">
 
+
+    <uses-feature
+        android:name="android.hardware.sensor.stepcounter"
+        android:required="true"/>
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -21,9 +26,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".StepCounter"></activity>
+        <activity android:name=".StepCounter" />
 
         <service android:name=".StepCountingService" />
+
+
+
+        <activity android:name=".leaderboardActivity"></activity>
     </application>
 
 </manifest>

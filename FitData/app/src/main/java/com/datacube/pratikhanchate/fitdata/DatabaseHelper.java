@@ -20,28 +20,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     //user columns
-    static final String USER_ID="user_id";
+
     static final String USER_NAME="name";
     static final String EMAIL="email";
-    static final String CONTACT_NUMBER="phoneNumber";
+    //static final String CONTACT_NUMBER="phoneNumber";
     static final String PASSWORD="password";
     static final String STEPS="steps";
     static final String IDLE_TIME="total_idleTime";
-    static final String LOCATION_HOME="Location_home";
-    static final String LOCATION_OFFICE="Location_office";
+    static final String LOCATION="Location";
+    static final String MILESTONES="milestones";
+
 
 
     private String CREATE_USER_TABLE = "CREATE TABLE " + DATABASE_TABLE + "("
-            + USER_ID + " TEXT,"
             + USER_NAME + " TEXT,"
             + EMAIL + " TEXT,"
-            + CONTACT_NUMBER + "TEXT,"
             + PASSWORD + " TEXT,"
-            + STEPS + "TEXT,"
-            + IDLE_TIME +"TEXT,"
-            + LOCATION_HOME + "TEXT,"
-            + LOCATION_OFFICE + "TEXT"
-            + ")";
+            + STEPS + " TEXT,"
+            + IDLE_TIME + " TEXT,"
+            + LOCATION + " TEXT,"
+            + MILESTONES + " TEXT"
+            + ");";
 
     private String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + DATABASE_TABLE;
 
@@ -60,13 +59,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
        super(context,DATABASE_NAME,null, DATABASE_VERSION);
        Log.e("DB","Oncreate1");
-       db=getWritableDatabase();
+     //  db=getWritableDatabase();
    }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
 
-       Log.e("DB","Oncreate");
+       Log.e("DB","OncreateX");
+
        try {
            db.execSQL(CREATE_USER_TABLE);
            Log.e("DB", "TABLE created successfully");
@@ -96,14 +96,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(EMAIL, user.getEmail());
         values.put(PASSWORD, user.getPassword());
 
-        /*  values.put(CONTACT_NUMBER,user.getPhoneNumber());
         values.put(STEPS,user.getSteps());
         values.put(IDLE_TIME,user.getTotal_idleTime());
-        values.put(LOCATION_HOME,user.getLocation_home());
-        values.put(LOCATION_OFFICE,user.getLocation_office());*/
+        values.put(LOCATION,user.getLocation());
+        values.put(MILESTONES,user.getMilestones());
 
         // Inserting Row
         db.insert(DATABASE_TABLE, null, values);
+
+        Log.d("DATABASEHELPER","ADDED USER SUCCESSFULLY");
         db.close();
     }
 
@@ -123,7 +124,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         String[] columns = {
                 USER_NAME,
                 EMAIL,
-                PASSWORD
+                PASSWORD,
+                STEPS,
+                IDLE_TIME,
+                LOCATION,
+                MILESTONES
         };
         // sorting orders
         String sortOrder =
@@ -154,6 +159,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 user.setName(cursor.getString(cursor.getColumnIndex(USER_NAME)));
                 user.setEmail(cursor.getString(cursor.getColumnIndex(EMAIL)));
                 user.setPassword(cursor.getString(cursor.getColumnIndex(PASSWORD)));
+                user.setSteps(cursor.getString(cursor.getColumnIndex(STEPS)));
+                user.setTotal_idleTime(cursor.getString(cursor.getColumnIndex(IDLE_TIME)));
+                user.setLocation(cursor.getString(cursor.getColumnIndex(LOCATION)));
+                user.setMilestones(cursor.getString(cursor.getColumnIndex(MILESTONES)));
                 // Adding user record to list
                 userList.add(user);
             } while (cursor.moveToNext());
@@ -166,6 +175,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+
+    public void updateUser(User user) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(USER_NAME, user.getName());
+        values.put(STEPS,user.getSteps());
+        values.put(LOCATION,user.getLocation());
+        values.put(MILESTONES,user.getMilestones());
+
+
+        // updating row
+       db.update(DATABASE_TABLE, values, USER_NAME + " = ?",
+                new String[]{String.valueOf(user.getName())});
+
+      //  db.update(DATABASE_TABLE, values, USER_NAME +"="+, null);
+
+        db.close();
+    }
 
     public boolean checkUser(String email, String password) {
 

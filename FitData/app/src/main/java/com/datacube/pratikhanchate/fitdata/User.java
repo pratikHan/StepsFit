@@ -4,25 +4,32 @@ import java.sql.Time;
 
 public class User {
 
-    String user_id;
-    String name;
-    String email;
-    String password;
-    String phoneNumber;
-    String steps;
-    String total_idleTime;
-    String Location_home;
-    String Location_office;
 
+    String name="";
+    String email="";
+    String password="";
+    String steps="";
+    String total_idleTime="";
+    String Location="";
+    String milestones="0";
 
-
-    public String getUser_id() {
-        return user_id;
+    public String getLocation() {
+        return Location;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setLocation(String location) {
+        Location = location;
     }
+
+    public String getMilestones() {
+        return milestones;
+    }
+
+    public void setMilestones(String milestones) {
+        this.milestones = milestones;
+    }
+
+
 
     public String getEmail() {
         return email;
@@ -40,13 +47,13 @@ public class User {
         this.password = password;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
+//    public String getPhoneNumber() {
+//        return phoneNumber;
+//    }
+//
+//    public void setPhoneNumber(String phoneNumber) {
+//        this.phoneNumber = phoneNumber;
+//    }
 
     public String getSteps() {
         return steps;
@@ -64,21 +71,6 @@ public class User {
         this.total_idleTime = total_idleTime;
     }
 
-    public String getLocation_home() {
-        return Location_home;
-    }
-
-    public void setLocation_home(String location_home) {
-        Location_home = location_home;
-    }
-
-    public String getLocation_office() {
-        return Location_office;
-    }
-
-    public void setLocation_office(String location_office) {
-        Location_office = location_office;
-    }
 
 
 

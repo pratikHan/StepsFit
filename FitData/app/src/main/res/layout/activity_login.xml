@@ -13,7 +13,7 @@
         android:gravity="center"
         android:orientation="vertical"
         android:paddingTop="0dp"
-       android:layout_marginBottom="40dp" n
+       android:layout_marginBottom="40dp" 
 
         tools:ignore="MissingConstraints">
 
