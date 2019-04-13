@@ -68,6 +68,7 @@ public class LoginActivity extends AppCompatActivity {
                 Log.e("Register", "Register button pressed");
 
                 Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivityForResult(intent,REQUEST_CODE);
             }
         });

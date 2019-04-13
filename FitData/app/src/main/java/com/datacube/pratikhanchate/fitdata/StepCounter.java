@@ -4,6 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,9 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 
 
 public class StepCounter extends AppCompatActivity {
@@ -57,7 +63,7 @@ public class StepCounter extends AppCompatActivity {
 
         userModel=new UserModel(email_id,dbhelper);
 
-        initViews();
+
 
 
 
@@ -66,6 +72,11 @@ public class StepCounter extends AppCompatActivity {
         current_date=Calendar.getInstance().getTime();
 
         Log.d("Date", "Current Date :"+current_date.toString());
+
+
+        initViews();
+       String address= getLocation(this);
+       Log.e("StepCounter","Address :"+address);
 
         intent = new Intent(this, StepCountingService.class);
 
@@ -233,6 +244,64 @@ public class StepCounter extends AppCompatActivity {
 
 
         userModel.updateUserInformation(user);
+
+
+
+    }
+
+
+    public String getLocation (Context mContext){
+
+        Location location=new Location("");
+        Geocoder geocoder =
+                new Geocoder(mContext, Locale.getDefault());
+
+
+        List<Address> addresses = null;
+        try {
+            /*
+             * Return 1 address.
+             */
+            addresses = geocoder.getFromLocation(location.getLatitude(),
+                    location.getLongitude(), 1);
+        } catch (IOException e1) {
+            Log.e("LocationSampleActivity",
+                    "IO Exception in getFromLocation()");
+            e1.printStackTrace();
+            return ("IO Exception trying to get address");
+        } catch (IllegalArgumentException e2) {
+            // Error message to post in the log
+            String errorString = "Illegal arguments " +
+                    Double.toString(location.getLatitude()) +
+                    " , " +
+                    Double.toString(location.getLongitude()) +
+                    " passed to address service";
+            Log.e("LocationSampleActivity", errorString);
+            e2.printStackTrace();
+            return errorString;
+        }
+        // If the reverse geocode returned an address
+        if (addresses != null && addresses.size() > 0) {
+            // Get the first address
+            Address address = addresses.get(0);
+            /*
+             * Format the first line of address (if available),
+             * city, and country name.
+             */
+            String addressText = String.format(
+                    "%s, %s, %s",
+                    // If there's a street address, add it
+                    address.getMaxAddressLineIndex() > 0 ?
+                            address.getAddressLine(0) : "",
+                    // Locality is usually a city
+                    address.getLocality(),
+                    // The country of the address
+                    address.getCountryName());
+            // Return the text
+            return addressText;
+        } else {
+            return "No address found";
+        }
 
 
 
