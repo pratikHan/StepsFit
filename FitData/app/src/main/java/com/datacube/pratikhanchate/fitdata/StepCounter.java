@@ -2,17 +2,26 @@ package com.datacube.pratikhanchate.fitdata;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
+import android.os.Handler;
+import android.os.Message;
+import android.provider.Settings;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.datacube.pratikhanchate.fitdata.locationModule.AppLocationService;
+import com.datacube.pratikhanchate.fitdata.locationModule.LocationAddress;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -42,6 +51,8 @@ public class StepCounter extends AppCompatActivity {
     int _steps=0;
     int _totalsteps=0;
 
+    AppLocationService appLocationService;
+
     private Intent intent;
 
     @Override
@@ -58,25 +69,25 @@ public class StepCounter extends AppCompatActivity {
 
         Intent prev_intent=getIntent();
         dbhelper=new DatabaseHelper(this);
-
         email_id=prev_intent.getStringExtra("EMAIL_ID");
-
         userModel=new UserModel(email_id,dbhelper);
 
-
-
-
-
         leaderboard=(Button)findViewById(R.id.btnleaderboard);
-
         current_date=Calendar.getInstance().getTime();
 
-        Log.d("Date", "Current Date :"+current_date.toString());
+
+
+
+        getlocationService();
+        Log.d("StepCounter", "Current Date :"+current_date.toString());
+
+
 
 
         initViews();
-       String address= getLocation(this);
-       Log.e("StepCounter","Address :"+address);
+
+//       String address= getLocation(this);
+//       Log.e("StepCounter","Address :"+address);
 
         intent = new Intent(this, StepCountingService.class);
 
@@ -249,61 +260,68 @@ public class StepCounter extends AppCompatActivity {
 
     }
 
+    private void getlocationService(){
 
-    public String getLocation (Context mContext){
+        //for location Service...
+        appLocationService=new AppLocationService(StepCounter.this);
+        Location location = appLocationService
+                .getLocation(LocationManager.GPS_PROVIDER);
 
-        Location location=new Location("");
-        Geocoder geocoder =
-                new Geocoder(mContext, Locale.getDefault());
-
-
-        List<Address> addresses = null;
-        try {
-            /*
-             * Return 1 address.
-             */
-            addresses = geocoder.getFromLocation(location.getLatitude(),
-                    location.getLongitude(), 1);
-        } catch (IOException e1) {
-            Log.e("LocationSampleActivity",
-                    "IO Exception in getFromLocation()");
-            e1.printStackTrace();
-            return ("IO Exception trying to get address");
-        } catch (IllegalArgumentException e2) {
-            // Error message to post in the log
-            String errorString = "Illegal arguments " +
-                    Double.toString(location.getLatitude()) +
-                    " , " +
-                    Double.toString(location.getLongitude()) +
-                    " passed to address service";
-            Log.e("LocationSampleActivity", errorString);
-            e2.printStackTrace();
-            return errorString;
-        }
-        // If the reverse geocode returned an address
-        if (addresses != null && addresses.size() > 0) {
-            // Get the first address
-            Address address = addresses.get(0);
-            /*
-             * Format the first line of address (if available),
-             * city, and country name.
-             */
-            String addressText = String.format(
-                    "%s, %s, %s",
-                    // If there's a street address, add it
-                    address.getMaxAddressLineIndex() > 0 ?
-                            address.getAddressLine(0) : "",
-                    // Locality is usually a city
-                    address.getLocality(),
-                    // The country of the address
-                    address.getCountryName());
-            // Return the text
-            return addressText;
+        if (location != null) {
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            LocationAddress locationAddress = new LocationAddress();
+            locationAddress.getAddressFromLocation(latitude, longitude,
+                    getApplicationContext(), new GeocoderHandler());
         } else {
-            return "No address found";
+
+            Log.e("StepsCounter","LocationService");
+            showSettingsAlert();
         }
-
-
 
     }
+
+    private class GeocoderHandler extends Handler {
+        @Override
+        public void handleMessage(Message message) {
+            String locationAddress;
+            switch (message.what) {
+                case 1:
+                    Bundle bundle = message.getData();
+                    locationAddress = bundle.getString("address");
+                    break;
+                default:
+                    locationAddress = null;
+            }
+           // tvAddress.setText(locationAddress);
+
+            Log.e("StepsCounter","Location Address"+locationAddress);
+        }
+    }
+
+
+    public void showSettingsAlert() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+                StepCounter.this);
+        alertDialog.setTitle("SETTINGS");
+        alertDialog.setMessage("Enable Location Provider! Go to settings menu?");
+        alertDialog.setPositiveButton("Settings",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(
+                                Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        StepCounter.this.startActivity(intent);
+                    }
+                });
+        alertDialog.setNegativeButton("Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        alertDialog.show();
+    }
+
+
+
 }
