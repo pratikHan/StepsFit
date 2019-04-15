@@ -17,7 +17,7 @@ public class UserModel {
         user_email=userEmail;
         databaseHelper=dbhelper;
         getAllUsersInformation();
-        displayallUsersData();
+
 
 
     }
@@ -65,15 +65,10 @@ public class UserModel {
     }
 
 
-    public void displayallUsersData(){
+    public List<User> retrieveAllUsersData(){
 
-        Log.d("DISPLAY","D1");
 
-        for(User user : userlist){
-            Log.d("USer List","USERS"+user.getEmail()+"......."+user.getPassword());
-            Log.d("USer ListA","Steps"+user.getSteps()+"......."+user.getMilestones());
-
-        }
+        return userlist;
     }
 
 }

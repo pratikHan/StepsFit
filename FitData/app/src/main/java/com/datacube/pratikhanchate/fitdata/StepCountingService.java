@@ -1,33 +1,30 @@
 package com.datacube.pratikhanchate.fitdata;
 
+import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
 import android.app.Service;
 
 import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.os.Build;
 import android.os.IBinder;
 
 
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Intent;
+
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.AsyncTask;
-import android.os.Bundle;
+
 import android.os.Handler;
-import android.os.IBinder;
-//import android.support.v7.app.NotificationCompat;
+
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.util.Date;
+
 
 public class StepCountingService extends Service implements SensorEventListener {
 
@@ -38,26 +35,24 @@ public class StepCountingService extends Service implements SensorEventListener 
 
     //int currentStepCount;
     int currentStepsDetected;
-
     int stepCounter;
     int newStepCounter;
 
-    boolean serviceStopped; // Boolean variable to control the repeating timer.
+    boolean serviceStopped;
 
     NotificationManager notificationManager;
 
-    // --------------------------------------------------------------------------- \\
-    // _ (1) declare broadcasting element variables _ \\
-    // Declare an instance of the Intent class.
+
     Intent intent;
-    // A string that identifies what kind of action is taking place.
+
     private static final String TAG = "StepService";
     public static final String BROADCAST_ACTION = "com.datacube.pratikhanchate.fitdata";
-    // Create a handler - that will be used to broadcast our data, after a specified amount of time.
+
     private final Handler handler = new Handler();
-    // Declare and initialise counter - for keeping a record of how many times the service carried out updates.
+    private final Handler handler_Notify=new Handler();
+
     int counter = 0;
-    // ___________________________________________________________________________ \\
+
 
 
     @Override
@@ -78,22 +73,21 @@ public class StepCountingService extends Service implements SensorEventListener 
         sensorManager.registerListener(this, stepCounterSensor, 0);
         sensorManager.registerListener(this, stepDetectorSensor, 0);
 
-        //currentStepCount = 0;
+
         currentStepsDetected = 0;
         stepCounter = 0;
         newStepCounter = 0;
 
         serviceStopped = false;
 
-        // --------------------------------------------------------------------------- \\
-        // ___ (3) start handler ___ \\
-        /////if (serviceStopped == false) {
-        // remove any existing callbacks to the handler
+
         handler.removeCallbacks(updateBroadcastData);
-        // call our handler with or without delay.
+
         handler.post(updateBroadcastData); // 0 seconds
-        /////}
-        // ___________________________________________________________________________ \\
+
+
+        handler_Notify.postDelayed(periodicNotify,60000);
+
 
         return START_STICKY;
     }
@@ -105,7 +99,7 @@ public class StepCountingService extends Service implements SensorEventListener 
 
         serviceStopped = true;
 
-      //  dismissNotification();
+        dismissNotification();
     }
 
     @Override
@@ -146,23 +140,35 @@ public class StepCountingService extends Service implements SensorEventListener 
     }
 
 
+    @SuppressLint("ObsoleteSdkInt")
     private void showNotification() {
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this);
-        notificationBuilder.setContentTitle("Pedometer");
-        notificationBuilder.setContentText("Pedometer session is running in the background.");
-       // notificationBuilder.setSmallIcon(R.mipmap.sneaker);
+        notificationBuilder.setContentTitle("FitData");
+        notificationBuilder.setContentText("You've been sitting idle for a while, Please go for a walk.");
+        notificationBuilder.setSmallIcon(R.drawable.avtar);
         notificationBuilder.setColor(Color.parseColor("#6600cc"));
         int colorLED = Color.argb(255, 0, 255, 0);
         notificationBuilder.setLights(colorLED, 500, 500);
         // To  make sure that the Notification LED is triggered.
-        notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
+        notificationBuilder.setPriority(Notification.PRIORITY_MAX);
         notificationBuilder.setOngoing(true);
 
         //Intent resultIntent = new Intent(this, MainActivity.class);
         PendingIntent resultPendingIntent = PendingIntent.getActivity(this,0,new Intent(),0);
         notificationBuilder.setContentIntent(resultPendingIntent);
 
-        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager = (NotificationManager) this.getSystemService(NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            String channelId = "Your_channel_id";
+
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    "Channel human readable title", importance);
+            notificationManager.createNotificationChannel(channel);
+            notificationBuilder.setChannelId(channelId);
+        }
 
 
         notificationManager.notify(0, notificationBuilder.build());
@@ -170,6 +176,7 @@ public class StepCountingService extends Service implements SensorEventListener 
     }
 
     private void dismissNotification() {
+        if(notificationManager!=null)
         notificationManager.cancel(0);
     }
 
@@ -183,6 +190,20 @@ public class StepCountingService extends Service implements SensorEventListener 
             }
         }
     };
+
+
+    private Runnable periodicNotify= new Runnable() {
+        @Override
+        public void run() {
+            if(!serviceStopped){
+                showNotification();
+                Log.e("StepCountingService","Notify");
+                handler_Notify.postDelayed(this,60000);
+            }
+
+        }
+    };
+
 
     private void broadcastSensorValue() {
         Log.d(TAG, "Data to Activity");

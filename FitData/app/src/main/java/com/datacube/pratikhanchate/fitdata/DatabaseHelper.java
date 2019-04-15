@@ -29,6 +29,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     static final String IDLE_TIME="total_idleTime";
     static final String LOCATION="Location";
     static final String MILESTONES="milestones";
+    static final String MILES="miles";
 
 
 
@@ -39,7 +40,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             + STEPS + " TEXT,"
             + IDLE_TIME + " TEXT,"
             + LOCATION + " TEXT,"
-            + MILESTONES + " TEXT"
+            + MILESTONES + " TEXT,"
+            + MILES + " TEXT"
             + ");";
 
     private String DROP_USER_TABLE = "DROP TABLE IF EXISTS " + DATABASE_TABLE;
@@ -58,8 +60,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
    public DatabaseHelper(Context context){
 
        super(context,DATABASE_NAME,null, DATABASE_VERSION);
+       db=getWritableDatabase();
        Log.e("DB","Oncreate1");
-     //  db=getWritableDatabase();
    }
 
     @Override
@@ -100,6 +102,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(IDLE_TIME,user.getTotal_idleTime());
         values.put(LOCATION,user.getLocation());
         values.put(MILESTONES,user.getMilestones());
+        values.put(MILES,user.getMiles());
+
 
         // Inserting Row
         db.insert(DATABASE_TABLE, null, values);
@@ -128,7 +132,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 STEPS,
                 IDLE_TIME,
                 LOCATION,
-                MILESTONES
+                MILESTONES,
+                MILES
         };
         // sorting orders
         String sortOrder =
@@ -163,6 +168,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 user.setTotal_idleTime(cursor.getString(cursor.getColumnIndex(IDLE_TIME)));
                 user.setLocation(cursor.getString(cursor.getColumnIndex(LOCATION)));
                 user.setMilestones(cursor.getString(cursor.getColumnIndex(MILESTONES)));
+                user.setMiles(cursor.getString(cursor.getColumnIndex(MILES)));
+
                 // Adding user record to list
                 userList.add(user);
             } while (cursor.moveToNext());
@@ -184,6 +191,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(STEPS,user.getSteps());
         values.put(LOCATION,user.getLocation());
         values.put(MILESTONES,user.getMilestones());
+        values.put(MILES,user.getMiles());
+
 
 
         // updating row

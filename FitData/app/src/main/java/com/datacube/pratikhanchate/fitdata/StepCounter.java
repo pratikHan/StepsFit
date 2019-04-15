@@ -5,8 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.location.Address;
-import android.location.Geocoder;
+
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Handler;
@@ -23,12 +22,10 @@ import android.widget.TextView;
 import com.datacube.pratikhanchate.fitdata.locationModule.AppLocationService;
 import com.datacube.pratikhanchate.fitdata.locationModule.LocationAddress;
 
-import java.io.IOException;
-import java.text.DecimalFormat;
+
 import java.util.Date;
 import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
+
 
 
 public class StepCounter extends AppCompatActivity {
@@ -41,7 +38,7 @@ public class StepCounter extends AppCompatActivity {
     TextView currentLocation;
     Button leaderboard;
     Boolean isServiceStopped;
-    Date current_date;
+    Date current_time;
 
     UserModel userModel;
     DatabaseHelper dbhelper;
@@ -62,7 +59,7 @@ public class StepCounter extends AppCompatActivity {
 
         username=(TextView)findViewById(R.id.txtUserName);
         currentSteps=(TextView)findViewById(R.id.txtcurrentSteps);
-        idleTime=(TextView)findViewById(R.id.txtidletime);
+       // idleTime=(TextView)findViewById(R.id.txtidletime);
         milestones_achieved=(TextView)findViewById(R.id.txtmilestones);
         totalSteps=(TextView)findViewById(R.id.txttotalsteps);
         currentLocation=(TextView)findViewById(R.id.txtlocation);
@@ -73,21 +70,15 @@ public class StepCounter extends AppCompatActivity {
         userModel=new UserModel(email_id,dbhelper);
 
         leaderboard=(Button)findViewById(R.id.btnleaderboard);
-        current_date=Calendar.getInstance().getTime();
-
-
+        current_time=Calendar.getInstance().getTime();
 
 
         getlocationService();
-        Log.d("StepCounter", "Current Date :"+current_date.toString());
-
-
-
+        Log.d("StepCounter", "Current Date :"+current_time.toString());
 
         initViews();
 
-//       String address= getLocation(this);
-//       Log.e("StepCounter","Address :"+address);
+
 
         intent = new Intent(this, StepCountingService.class);
 
@@ -100,6 +91,7 @@ public class StepCounter extends AppCompatActivity {
             public void onClick(View v) {
 
                 Intent intent = new Intent(getApplicationContext(), leaderboardActivity.class);
+                intent.putExtra("EMAIL",email_id);
                 startActivity(intent);
 
             }
@@ -143,14 +135,9 @@ public class StepCounter extends AppCompatActivity {
         // retrieve data out of the intent.
 
         String b_counted_steps=String.valueOf(intent.getStringExtra("Counted_Step"));
-     //  currentSteps.setText( b_counted_steps);
-
         String b_steps=String.valueOf(intent.getStringExtra("Detected_Step"));
 
-
-
-
-         int final_steps=Integer.parseInt(b_steps)+_steps;
+        int final_steps=Integer.parseInt(b_steps)+_steps;
 
          if(final_steps != Integer.parseInt(currentSteps.getText().toString())){
              isMilestoneAchieved(final_steps);
@@ -158,34 +145,21 @@ public class StepCounter extends AppCompatActivity {
          }
 
 
-        Log.d("UPDATE VIEWS", "Current :"+b_counted_steps +"Total Steps :"+b_steps);
-
-        Log.d("UPDATE VIEWS", "CALCULATED:"+_steps);
-
-
-
-
-        totalSteps.setText(""+final_steps);
-
-
-
-
-      //  stepCountTxV.setText('"' + String.valueOf(countedStep) + '"' + " Steps Counted");
-       // stepDetectTxV.setText("Steps Detected = " + String.valueOf(DetectedStep) + '"');
-
 
     }
 
 
     public void isMilestoneAchieved(int steps){
 
-        if(steps % 10 == 0 && steps != 0){
+        double feet = steps*2.5;
+
+        if(feet % 100 == 0 && feet != 0){
             milestones=milestones+1;
             Log.d("Milestones Achieved","Miles"+milestones);
             milestones_achieved.setText(""+milestones);
         }
 
-        convertToKms(steps);
+        convertToMiles(steps);
     }
 
     public void initViews(){
@@ -196,13 +170,14 @@ public class StepCounter extends AppCompatActivity {
 
 
             currentSteps.setText(""+0);
+            totalSteps.setText(""+0);
 
 
             username.setText(user.getName());
             currentSteps.setText(user.getSteps());
-            idleTime.setText(user.getTotal_idleTime());
+          //  idleTime.setText(user.getTotal_idleTime());
             milestones_achieved.setText(user.getMilestones());
-            totalSteps.setText(user.getSteps());
+            totalSteps.setText(user.getMiles());
             milestones= Integer.parseInt(milestones_achieved.getText().toString());
 
 
@@ -221,37 +196,28 @@ public class StepCounter extends AppCompatActivity {
 
 
 
-
-
-        //currentLocation;
-
-
-
-
     }
 
 
-    public void convertToKms(int steps){
-
-        double kilometers = (double)steps/1312.000;
-        double feet = steps*2.5;
-
-        DecimalFormat df=new DecimalFormat("0.00000");
-
-        Log.e("Kilometers","KMVal :"+df.format(kilometers) +"  FEETS"+feet)   ;
 
 
+    public void convertToMiles(int steps){
 
+        double miles = ((double)steps/2112);
+        String _miles=""+miles;
+        String res=_miles.substring(0,5);
+        totalSteps.setText(""+res+"miles");
 
-    }
+        }
 
     private void updateInDatabase(){
         User user =new User();
         user.setName(username.getText().toString());
         user.setSteps(currentSteps.getText().toString());
         user.setMilestones(milestones_achieved.getText().toString());
-        user.setTotal_idleTime(idleTime.getText().toString());
+      //  user.setTotal_idleTime(idleTime.getText().toString());
         user.setLocation(currentLocation.getText().toString());
+        user.setMiles(totalSteps.getText().toString());
 
 
         userModel.updateUserInformation(user);
@@ -293,7 +259,10 @@ public class StepCounter extends AppCompatActivity {
                 default:
                     locationAddress = null;
             }
-           // tvAddress.setText(locationAddress);
+
+
+            currentLocation.setText(locationAddress);
+
 
             Log.e("StepsCounter","Location Address"+locationAddress);
         }

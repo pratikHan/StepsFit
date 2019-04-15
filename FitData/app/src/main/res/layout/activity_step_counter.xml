@@ -48,18 +48,7 @@
                 android:layout_marginRight="20dp"
                 >
                 <TableRow>
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@drawable/milestone"
-                        />
 
-                    <TextView
-                        android:id="@+id/txtmilestones"
-                        android:layout_width="125dp"
-                        android:layout_height="50dp"
-                        android:text="0"
-                        android:textSize="40dp"/>
 
                     <ImageView
                         android:layout_width="50dp"
@@ -71,7 +60,21 @@
 
                     <TextView
                         android:id="@+id/txttotalsteps"
-                        android:layout_width="125dp"
+                        android:layout_width="155dp"
+                        android:layout_height="40dp"
+                        android:text="0"
+                        android:textSize="30dp"/>
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_marginLeft="40dp"
+                        android:src="@drawable/milestone"
+                        />
+
+                    <TextView
+                        android:id="@+id/txtmilestones"
+                        android:layout_width="55dp"
                         android:layout_height="50dp"
                         android:text="0"
                         android:textSize="40dp"/>
@@ -79,19 +82,11 @@
                 </TableRow>
 
 
-                <TableRow>
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:src="@drawable/idle1"
-                        />
+                <TableRow
+                    android:layout_marginTop="20dp">
 
-                    <TextView
-                        android:id="@+id/txtidletime"
-                        android:layout_width="125dp"
-                        android:layout_height="50dp"
-                        android:text="0"
-                        android:textSize="40dp"/>
+
+
 
                     <ImageView
                         android:layout_width="50dp"
@@ -103,10 +98,10 @@
 
                     <TextView
                         android:id="@+id/txtlocation"
-                        android:layout_width="125dp"
-                        android:layout_height="50dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="Ofc"
-                        android:textSize="40dp"/>
+                        android:textSize="20dp"/>
 
                 </TableRow>
 

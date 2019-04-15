@@ -13,6 +13,16 @@ public class User {
     String Location="";
     String milestones="0";
 
+    public String getMiles() {
+        return miles;
+    }
+
+    public void setMiles(String miles) {
+        this.miles = miles;
+    }
+
+    String miles="";
+
     public String getLocation() {
         return Location;
     }
@@ -47,13 +57,7 @@ public class User {
         this.password = password;
     }
 
-//    public String getPhoneNumber() {
-//        return phoneNumber;
-//    }
-//
-//    public void setPhoneNumber(String phoneNumber) {
-//        this.phoneNumber = phoneNumber;
-//    }
+
 
     public String getSteps() {
         return steps;
